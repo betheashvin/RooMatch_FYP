@@ -3,22 +3,30 @@ interface StudioProps {
 }
 
 const SELLER_LINES = [
-  "M110 150 C264 150 264 257 418 257",
-  "M110 255 C264 255 264 257 418 257",
-  "M110 360 C264 360 264 257 418 257",
-  "M215 255 C316 255 316 257 418 257",
+  "M92 70 C300 70 300 174 483 174",
+  "M92 165 C300 165 300 174 483 174",
+  "M92 260 C300 260 300 174 483 174",
 ];
 const SKILL_LINES = [
-  "M715 150 C631 150 631 257 547 257",
-  "M715 255 C631 255 631 257 547 257",
-  "M715 360 C631 360 631 257 547 257",
+  "M965 70 C800 70 800 174 643 174",
+  "M965 165 C800 165 800 174 643 174",
+  "M965 260 C800 260 800 174 643 174",
 ];
 
-const SKILLS = [
-  { y: 132, label: "Creativity", icon: "spark" },
-  { y: 237, label: "Your taste", icon: "heart" },
-  { y: 342, label: "Design sense", icon: "pen" },
+const SELLERS = [
+  { src: "/sellers/stock_1.png", cy: 70 },
+  { src: "/sellers/stock_2.png", cy: 165 },
+  { src: "/sellers/stock_3.png", cy: 260 },
 ];
+
+const DESIGN = [
+  { icon: "spark", label: "Creativity", cy: 70 },
+  { icon: "heart", label: "Your taste", cy: 165 },
+  { icon: "pen", label: "Design sense", cy: 260 },
+];
+
+const SELLER_X = 92;
+const DESIGN_X = 965;
 
 export function Studio({ onPlanRoom }: StudioProps) {
   return (
@@ -37,7 +45,7 @@ export function Studio({ onPlanRoom }: StudioProps) {
           </p>
         </div>
 
-        <div className="mx-auto mt-3 max-w-6xl">
+        <div className="mx-auto mt-1 max-w-7xl">
           <HubScene />
         </div>
         <div className="mt-6 text-center">
@@ -59,10 +67,10 @@ function HubScene() {
   return (
     <div className="relative">
       <svg
-        viewBox="0 0 960 520"
+        viewBox="0 0 1120 345"
         className="h-auto w-full"
         role="img"
-        aria-label="RooMatch Studio hub: local seller logos on the left and design-creativity cues on the right, connected by animated lines to a laptop whose screen shows the RooMatch logo building itself"
+        aria-label="RooMatch Studio hub: local seller logos on the left and design-creativity cues on the right, both funneling by animated lines into a laptop whose screen shows the RooMatch logo building itself"
       >
         <defs>
           <filter id="rm-feather" x="-6%" y="-6%" width="112%" height="112%">
@@ -70,15 +78,20 @@ function HubScene() {
           </filter>
           <mask id="rm-photo-mask">
             <rect
-              x="314"
-              y="164"
-              width="332"
-              height="173"
-              rx="20"
+              x="349"
+              y="54"
+              width="422"
+              height="223"
+              rx="22"
               fill="#ffffff"
               filter="url(#rm-feather)"
             />
           </mask>
+          {SELLERS.map((_, i) => (
+            <clipPath key={i} id={`rm-seller-${i}`}>
+              <circle cx={SELLER_X} cy={SELLERS[i].cy} r="30" />
+            </clipPath>
+          ))}
         </defs>
 
         {/* Animated Line Connectors */}
@@ -110,15 +123,37 @@ function HubScene() {
         {/* Laptop picture */}
         <image
           href="/laptop_tea_phone.jpeg"
-          x="300"
-          y="150"
-          width="360"
-          height="201"
+          x="335"
+          y="40"
+          width="450"
+          height="251"
           preserveAspectRatio="xMidYMid slice"
           mask="url(#rm-photo-mask)"
         />
 
         {/* Left Seller Logos */}
+        {SELLERS.map((s, i) => (
+          <g key={s.src}>
+            <circle cx={SELLER_X} cy={s.cy} r="30" fill="#ffffff" />
+            <image
+              href={s.src}
+              x={SELLER_X - 30}
+              y={s.cy - 30}
+              width="60"
+              height="60"
+              preserveAspectRatio="xMidYMid meet"
+              clipPath={`url(#rm-seller-${i})`}
+            />
+            <circle
+              cx={SELLER_X}
+              cy={s.cy}
+              r="30"
+              fill="none"
+              stroke="#e2d9c8"
+              strokeWidth="2"
+            />
+          </g>
+        ))}
         {/* 100+ label  */}
         <text
           x="215"
@@ -145,28 +180,33 @@ function HubScene() {
         </text>
 
         {/* Right Section */}
-        {SKILLS.map((s) => (
-          <g key={s.label} transform={`translate(715 ${s.y})`}>
-            <rect
-              width="150"
-              height="36"
-              rx="18"
+        {DESIGN.map((d) => (
+          <g key={d.label}>
+            <circle
+              cx={DESIGN_X}
+              cy={d.cy}
+              r="30"
               fill="#2b3724"
               stroke="#4a5a40"
-              strokeWidth="1"
+              strokeWidth="1.5"
             />
-            <SkillIcon kind={s.icon} />
+            <g
+              transform={`translate(${DESIGN_X} ${d.cy}) scale(1.5) translate(-18 -16)`}
+            >
+              <SkillIcon kind={d.icon} />
+            </g>
             <text
-              x="42"
-              y="23"
+              x={DESIGN_X + 42}
+              y={d.cy + 5}
               fontSize="13"
               fontFamily="Inter, sans-serif"
-              fill="#f4efe6"
+              fill="#2a2620"
             >
-              {s.label}
+              {d.label}
             </text>
           </g>
         ))}
+
         <text
           x="790"
           y="406"
@@ -185,9 +225,9 @@ function HubScene() {
         alt="RooMatch logo"
         className="pointer-events-none absolute"
         style={{
-          left: "50.2%",
-          top: "50%",
-          width: "9%",
+          left: "50.3%",
+          top: "50.4%",
+          width: "10%",
           transform: "translate(-50%, -50%)",
         }}
       />
