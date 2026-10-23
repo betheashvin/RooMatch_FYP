@@ -3,6 +3,11 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 pydantic>=2.7
 
+# PostgreSQL catalog persistence (Neon or a local PostgreSQL server)
+sqlmodel>=0.0.24,<0.1
+psycopg[binary]>=3.2,<4
+python-dotenv>=1.0,<2
+
 # Spatial-validation engine (step 3): 2D computational geometry
 shapely>=2.0
 

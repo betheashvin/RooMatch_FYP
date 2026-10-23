@@ -1,0 +1,6 @@
+# Offline-only dependencies: computing CLIP style embeddings via
+# scripts/embed_catalog.py. NOT needed to run the API itself.
+# Installs are large (~GB); CPU is fine for the one-off embedding pass.
+torch>=2.2
+open_clip_torch>=2.24
+pillow>=10.0
