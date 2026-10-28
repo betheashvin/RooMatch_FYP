@@ -57,6 +57,9 @@ export function Studio({ onPlanRoom }: StudioProps) {
             Start Designing
             <span aria-hidden="true">→</span>
           </button>
+          <p className="text-xs text-ink/50">
+           Your space. Your style. Your choices.
+           </p>
         </div>
       </div>
     </section>
@@ -122,7 +125,7 @@ function HubScene() {
 
         {/* Laptop picture */}
         <image
-          href="/laptop_tea_phone.jpeg"
+          href="/laptop_tea_phone.jpg"
           x="335"
           y="40"
           width="450"
@@ -208,10 +211,10 @@ function HubScene() {
         ))}
 
         <text
-          x="790"
-          y="406"
+          x="965"
+          y="322"
           textAnchor="middle"
-          fontSize="12"
+          fontSize="13"
           fontFamily="Inter, sans-serif"
           fill="#2a2620"
           fillOpacity="0.55"

@@ -83,7 +83,7 @@ const STATS = [
 export function Hero({ onPlanRoom }: HeroProps) {
   return (
     <section id="top" className="bg-forest-800">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-8 lg:grid-cols-[1.05fr_lfr] lg:gap-10 lg:pb-28 lg:pt-10">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pb-28 lg:pt-10">
         {/* Left section */}
         <div>
           <h1 className="font-serif text-5xl font-semibold leading-[1.04] tracking-tight text-cream sm:text-6xl">
@@ -127,8 +127,14 @@ export function Hero({ onPlanRoom }: HeroProps) {
             onLoadedMetadata={(e) => {
               e.currentTarget.playbackRate = VIDEO_SPEED;
             }}
+            onMouseEnter={(e) => {
+              const video = e.currentTarget;
+              video.currentTime = 0;
+              video.playbackRate =VIDEO_SPEED;
+              void video.play();
+            }}
             className="block w-full rounded-3xl bg-forest-700 shadow-2xl ring-1 ring-black/5"
-          ></video>
+          />
         </div>
       </div>
     </section>
