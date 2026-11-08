@@ -3,12 +3,14 @@ import { useReducer } from "react";
 import type {
   Category,
   Door,
+  FixedItem,
   FitReport,
   Footprint,
   Layout,
   Placement,
   Product,
   Room,
+  WindowOpening,
 } from "../types/api";
 
 // A placed item as the editor sees it. We keep the whole Product (for the label,
@@ -19,6 +21,7 @@ export interface EditorPlacement {
   instanceId: string;
   product: Product;
   footprint: Footprint;
+  custom?: boolean;
 }
 
 export interface EditorState {
@@ -32,6 +35,13 @@ export interface EditorState {
 }
 
 export type EditorAction =
+  | { type: "restoreSaved"; room: Room; placements: EditorPlacement[]; budgetPkr: number | null }
+  | { type: "setRoomName"; name: string }
+  | { type: "addFixedItem"; item: FixedItem }
+  | { type: "removeFixedItem"; id: string }
+  | { type: "addCustom"; placement: EditorPlacement }
+  | { type: "addWindow"; window: WindowOpening }
+  | { type: "removeWindow"; id: string }
   | { type: "setRoomSize"; width_cm: number; length_cm: number }
   | { type: "addProduct"; product: Product }
   | { type: "movePlacement"; instanceId: string; x: number; y: number }
@@ -62,7 +72,7 @@ const initialRoom: Room = {
   fixed_items: [],
 };
 
-const initialState: EditorState = {
+export const initialEditorState: EditorState = {
   room: initialRoom,
   placements: [],
   selectedId: null,
@@ -76,6 +86,20 @@ const initialState: EditorState = {
 // so we drop it — stale green/red badges are worse than none.
 function reducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
+    case "restoreSaved":
+      return { ...initialEditorState, room: action.room, placements: action.placements, budgetPkr: action.budgetPkr };
+    case "setRoomName":
+      return { ...state, room: { ...state.room, name: action.name } };
+    case "addFixedItem":
+      return { ...state, room: { ...state.room, fixed_items: [...state.room.fixed_items, action.item] }, fitReport: null };
+    case "removeFixedItem":
+      return { ...state, room: { ...state.room, fixed_items: state.room.fixed_items.filter(item => item.id !== action.id) }, fitReport: null };
+    case "addCustom":
+      return { ...state, placements: [...state.placements, action.placement], selectedId: action.placement.instanceId, fitReport: null };
+    case "addWindow":
+      return { ...state, room: { ...state.room, windows: [...state.room.windows, action.window] }, fitReport: null };
+    case "removeWindow":
+      return { ...state, room: { ...state.room, windows: state.room.windows.filter(window => window.id !== action.id) }, fitReport: null };
     case "setRoomSize": {
       const width_cm = clamp(action.width_cm, 100, 2000);
       const length_cm = clamp(action.length_cm, 100, 2000);
@@ -193,7 +217,7 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
       return { ...state, query: action.query };
 
     case "reset":
-      return initialState;
+      return initialEditorState;
 
     case "loadLayout": {
       // The recommendation engine returns placements by product id; rebuild the
@@ -222,7 +246,7 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
   }
 }
 
-export function useEditor() {
+export function useEditor(initialState = initialEditorState) {
   return useReducer(reducer, initialState);
 }
 

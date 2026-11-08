@@ -1,7 +1,7 @@
-interface StudioProps {
-  onPlanRoom: () => void;
-}
+import { Link } from "react-router-dom";
 
+// Nodes on both sides funnel to a single entry point on the laptop screen, then
+// run behind the photo and dissolve into it.
 const SELLER_LINES = [
   "M92 70 C300 70 300 174 483 174",
   "M92 165 C300 165 300 174 483 174",
@@ -28,36 +28,36 @@ const DESIGN = [
 const SELLER_X = 92;
 const DESIGN_X = 965;
 
-export function Studio({ onPlanRoom }: StudioProps) {
+export function Studio() {
   return (
     <section className="border-t border-ink/10 bg-cream py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-2xl text-center ">
+        <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">
             Design Studio
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+          <h2 className="mt-4 font-serif text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
             Grab a chai and design.
           </h2>
-          <p className="mt-3 text-ink/60">
-            Hundreds of local sellers' furniture on one side, your own taste and
-            creativity on the other — the Studio is where they meet.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-ink/65 sm:text-base sm:leading-7">
+            Discover furniture from local sellers and bring your own taste and
+            creativity together in one place.
           </p>
         </div>
 
         <div className="mx-auto mt-1 max-w-7xl">
           <HubScene />
         </div>
+
         <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={onPlanRoom}
+          <Link
+            to="/studio"
             className="inline-flex items-center gap-2 rounded-lg bg-terracotta px-7 py-3.5 font-medium text-cream shadow-sm transition-colors hover:bg-terracotta-600"
           >
-            Start Designing
+            Start designing
             <span aria-hidden="true">→</span>
-          </button>
-          <p className="text-xs text-ink/50">
+          </Link>
+           <p className="text-xs text-ink/50">
            Your space. Your style. Your choices.
            </p>
         </div>
@@ -97,7 +97,7 @@ function HubScene() {
           ))}
         </defs>
 
-        {/* Animated Line Connectors */}
+        {/* animated connectors — run behind the photo */}
         {SELLER_LINES.map((d, i) => (
           <path
             key={d}
@@ -123,7 +123,7 @@ function HubScene() {
           />
         ))}
 
-        {/* Laptop picture */}
+        {/* laptop-tea photo — edges feathered so it blends into the section */}
         <image
           href="/laptop_tea_phone.jpg"
           x="335"
@@ -134,7 +134,7 @@ function HubScene() {
           mask="url(#rm-photo-mask)"
         />
 
-        {/* Left Seller Logos */}
+        {/* left: real seller logos in consistent circles */}
         {SELLERS.map((s, i) => (
           <g key={s.src}>
             <circle cx={SELLER_X} cy={s.cy} r="30" fill="#ffffff" />
@@ -157,32 +157,32 @@ function HubScene() {
             />
           </g>
         ))}
-        {/* 100+ label  */}
+        {/* 100+ aggregate */}
+        <circle cx="176" cy="165" r="24" fill="#c15f3c" />
         <text
-          x="215"
-          y="261"
+          x="176"
+          y="171"
           textAnchor="middle"
-          fontSize="15"
+          fontSize="14"
           fontWeight="700"
           fontFamily="Inter, sans-serif"
           fill="#f4efe6"
         >
           100+
         </text>
-
         <text
-          x="150"
-          y="406"
+          x="120"
+          y="322"
           textAnchor="middle"
-          fontSize="12"
+          fontSize="13"
           fontFamily="Inter, sans-serif"
           fill="#2a2620"
           fillOpacity="0.55"
         >
-          Sellers
+          Local sellers
         </text>
 
-        {/* Right Section */}
+        {/* right: design / creativity cues (mirror the sellers) */}
         {DESIGN.map((d) => (
           <g key={d.label}>
             <circle
@@ -209,7 +209,6 @@ function HubScene() {
             </text>
           </g>
         ))}
-
         <text
           x="965"
           y="322"
@@ -223,6 +222,7 @@ function HubScene() {
         </text>
       </svg>
 
+      {/* self-animating logo overlaid on the laptop screen */}
       <img
         src="/logo.svg"
         alt="RooMatch logo"

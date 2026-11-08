@@ -1,8 +1,8 @@
 
-const FOOTER_LINKS = [
-  { label: "Room Planner", href: "#planner" },
-  { label: "Furniture Catalog", href: "#furniture" },
+const LINKS = [
+  { label: "Explore Furniture", href: "#furniture" },
   { label: "How It Works", href: "#how-it-works" },
+  { label: "Why RooMatch", href: "#why-roomatch" },
 ];
 
 export function Footer() {
@@ -45,7 +45,7 @@ export function Footer() {
           </div>
 
           <nav className="flex flex-wrap gap-x-5 gap-y-2 sm:justify-end">
-            {FOOTER_LINKS.map((link) => (
+            {LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}

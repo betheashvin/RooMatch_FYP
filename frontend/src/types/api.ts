@@ -1,3 +1,7 @@
+// TypeScript mirror of the backend data model (backend/app/models/*).
+// Hand-written for now; later this can be auto-generated from the API's OpenAPI
+// schema so the two never drift.
+
 export type Category =
   | "sofa"
   | "loveseat"
@@ -82,6 +86,8 @@ export interface FixedItem {
   id: string;
   label: string;
   footprint: Footprint;
+  height_cm?: number | null;
+  product_id?: string | null;
 }
 
 export interface Room {
@@ -94,6 +100,8 @@ export interface Room {
   windows: WindowOpening[];
   fixed_items: FixedItem[];
 }
+
+// --- layout + validation (mirror backend/app/models/layout.py) ---
 
 export interface Placement {
   product_id: string;
@@ -119,6 +127,39 @@ export interface ValidateRequest {
   door_clearance_cm?: number;
 }
 
+// --- recommendation engine (mirror backend/app/models/recommend.py) ---
+
+export interface RecommendedItem {
+  product: Product;
+  score: number;
+  reason: string;
+}
+
+export interface RecommendedSet {
+  items: RecommendedItem[];
+  total_price_pkr: number;
+  budget_pkr: number;
+  within_budget: boolean;
+}
+
+// Body for POST /api/recommend and /api/recommend/layout.
+export interface CategoryPreference {
+  attributes?: Record<string, string>;
+  min_size_cm?: number | null;
+  max_size_cm?: number | null;
+}
+
+export interface RecommendRequest {
+  room: Room;
+  budget_pkr: number;
+  style_tags?: string[];
+  style_seed_product_id?: string | null;
+  categories?: Category[];
+  preferences?: Partial<Record<Category, CategoryPreference>>;
+  colors?: string[];
+}
+
+// The authoritative placed + validated result (mirror backend/app/models/layout.py).
 export interface Layout {
   room_id: string;
   placements: Placement[];
@@ -126,4 +167,66 @@ export interface Layout {
   budget_pkr?: number | null;
   within_budget?: boolean | null;
   fit_report?: FitReport | null;
+}
+
+export interface User {
+  user_id: string;
+  email: string;
+  is_verified: boolean;
+  created_at: string;
+}
+
+export interface CustomDimensions {
+  width_cm: number;
+  depth_cm: number;
+  height_cm?: number | null;
+}
+
+export interface SavedItem {
+  item_id?: string;
+  product_id: string | null;
+  x_position_cm: number;
+  y_position_cm: number;
+  rotation_deg: number;
+  is_fixed: boolean;
+  custom_dimensions: CustomDimensions | null;
+  label?: string | null;
+  product?: Product | null;
+}
+
+export interface LayoutAppearance {
+  wall_color: string;
+  wall_finish_id: string;
+  floor_id: string;
+}
+
+export interface LayoutWrite {
+  name: string;
+  room_width_cm: number;
+  room_length_cm: number;
+  door_window_config: {
+    room_id: string;
+    height_cm: number | null;
+    doors: Door[];
+    windows: WindowOpening[];
+  };
+  budget_pkr: number | null;
+  appearance: LayoutAppearance;
+  items: SavedItem[];
+}
+
+export interface SavedLayout extends LayoutWrite {
+  layout_id: string;
+  user_id: string;
+  updated_at: string;
+}
+
+export interface LayoutSummary {
+  layout_id: string;
+  name: string;
+  room_width_cm: number;
+  room_length_cm: number;
+  updated_at: string;
+  item_count: number;
+  budget_pkr: number | null;
 }

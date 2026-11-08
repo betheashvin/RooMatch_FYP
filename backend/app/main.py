@@ -8,15 +8,19 @@ Interactive API docs are then at http://localhost:8000/docs
 
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
 
-from .database import create_schema, get_engine
+from .database import _ENV_FILE, create_schema, get_engine
 
-from .routers import catalog, health, recommend, validate
+from .routers import auth, catalog, health, layouts, validate
+
+load_dotenv(_ENV_FILE, override=False)
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -40,10 +44,9 @@ async def database_unavailable(_request: Request, exc: SQLAlchemyError):
 # during development. Tighten / make configurable before any deployment.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=[origin.strip() for origin in os.getenv(
+        "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -52,7 +55,8 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api")
 app.include_router(catalog.router, prefix="/api")
 app.include_router(validate.router, prefix="/api")
-app.include_router(recommend.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(layouts.router, prefix="/api")
 
 
 @app.get("/")

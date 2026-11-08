@@ -2,26 +2,27 @@ import { Navbar } from "./Navbar";
 import { Hero } from "./Hero";
 import { Studio } from "./Studio";
 import { HowItWorks } from "./HowItWorks";
+import { FurnitureCatalog } from "./FurnitureCatalog";
 import { WhyRooMatch } from "./WhyRooMatch";
 import { CTA } from "./CTA";
-import { Footer } from "./Footer"
-import { FurnitureCatalog } from "./FurnitureCatalog";
+import { Footer } from "./Footer";
 
-interface HomeProps {
-    onPlanRoom: () => void;
-}
+export function Home() {
+  return (
+    <div className="min-h-screen bg-forest-800">
+      <Navbar />
+      <Hero />
 
-export function Home({ onPlanRoom }: HomeProps) {
-    return(
-        <div className="min-h-screen bg-forest-800">
-            <Navbar onPlanRoom={onPlanRoom}/>
-            <Hero onPlanRoom={onPlanRoom}/>
-            <Studio onPlanRoom={onPlanRoom}/>
-            <HowItWorks/>
-            <FurnitureCatalog onPlanRoom={onPlanRoom} />
-            <WhyRooMatch />
-            < CTA onPlanRoom={onPlanRoom} />
-            <Footer />
-        </div>
-    )
+      <Studio />
+
+      <HowItWorks />
+
+      <FurnitureCatalog />
+
+      <WhyRooMatch />
+
+      <CTA />
+      <Footer />
+    </div>
+  );
 }

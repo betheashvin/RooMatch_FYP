@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
-interface HeroProps {
-  onPlanRoom: () => void;
-}
-
+// Bump playback so the furniture-placement clip reads quickly in the hero.
 const VIDEO_SPEED = 1.5;
 
 const STATS = [
@@ -11,13 +9,7 @@ const STATS = [
     label: "Space",
     value: "Fits your room",
     icon: (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
           d="M4 15V4h11M4 15l5 5M4 15h16v-5"
           stroke="currentColor"
@@ -32,28 +24,9 @@ const STATS = [
     label: "Budget",
     value: "Under your budget",
     icon: (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <rect
-          x="3"
-          y="6"
-          width="18"
-          height="13"
-          rx="3"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M3 10h18M16 15h2"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="6" width="18" height="13" rx="3" stroke="currentColor" strokeWidth="2" />
+        <path d="M3 10h18M16 15h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -61,13 +34,7 @@ const STATS = [
     label: "Local",
     value: "Karachi furniture",
     icon: (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
           d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11Z"
           stroke="currentColor"
@@ -80,11 +47,11 @@ const STATS = [
   },
 ];
 
-export function Hero({ onPlanRoom }: HeroProps) {
+export function Hero() {
   return (
-    <section id="top" className="bg-forest-800">
+    <section className="bg-forest-800">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pb-28 lg:pt-10">
-        {/* Left section */}
+        {/* Left: headline + CTA + stat cards */}
         <div>
           <h1 className="font-serif text-5xl font-semibold leading-[1.04] tracking-tight text-cream sm:text-6xl">
             Step into a room
@@ -94,15 +61,15 @@ export function Hero({ onPlanRoom }: HeroProps) {
             And your budget.
           </h1>
 
-          <button
-            type="button"
-            onClick={onPlanRoom}
+          <Link
+            to="/studio"
             className="mt-8 inline-flex items-center gap-2 rounded-lg bg-terracotta px-6 py-3 font-medium text-cream shadow-sm transition-colors hover:bg-terracotta-600"
           >
             Start Planning
             <span aria-hidden="true">→</span>
-          </button>
+          </Link>
 
+          {/* stat cards reveal one after another */}
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {STATS.map((s, i) => (
               <StatCard
@@ -116,27 +83,29 @@ export function Hero({ onPlanRoom }: HeroProps) {
           </div>
         </div>
 
-        {/* Right Hero Section */}
+       
 
-        <div>
-          <video
-            src="/hero.mp4"
-            autoPlay
-            muted
-            playsInline
-            onLoadedMetadata={(e) => {
-              e.currentTarget.playbackRate = VIDEO_SPEED;
-            }}
-            onMouseEnter={(e) => {
-              const video = e.currentTarget;
-              video.currentTime = 0;
-              video.playbackRate =VIDEO_SPEED;
-              void video.play();
-            }}
-            className="block w-full rounded-3xl bg-forest-700 shadow-2xl ring-1 ring-black/5"
-          />
-        </div>
-      </div>
+{/* Right: furniture-placement video */}
+<div>
+  <video
+    src="/hero.mp4"
+    autoPlay
+    muted
+    playsInline
+    preload="auto"
+    onLoadedMetadata={(e) => {
+      e.currentTarget.playbackRate = VIDEO_SPEED;
+    }}
+    onMouseEnter={(e) => {
+      const video = e.currentTarget;
+      video.currentTime = 0;
+      video.playbackRate = VIDEO_SPEED;
+      void video.play();
+    }}
+    className="block w-full rounded-3xl bg-forest-700 shadow-2xl ring-1 ring-black/5"
+  />
+</div>
+  </div>
     </section>
   );
 }
@@ -161,9 +130,7 @@ function StatCard({
         {icon}
       </span>
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-sage">
-          {label}
-        </p>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-sage">{label}</p>
         <p className="text-sm font-semibold text-cream">{value}</p>
       </div>
     </div>

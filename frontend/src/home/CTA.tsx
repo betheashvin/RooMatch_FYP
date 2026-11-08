@@ -1,8 +1,6 @@
-interface CTAProps {
-  onPlanRoom: () => void;
-}
+import { Link } from "react-router-dom";
 
-export function CTA({ onPlanRoom }: CTAProps) {
+export function CTA() {
   return (
     <section className="bg-forest-800 py-24">
       <div className="mx-auto max-w-3xl px-6 text-center">
@@ -12,14 +10,13 @@ export function CTA({ onPlanRoom }: CTAProps) {
         <p className="mx-auto mt-4 max-w-xl text-sage">
           Start with your room measurements and explore local pieces that actually fit.
         </p>
-        <button
-          type="button"
-          onClick={onPlanRoom}
+        <Link
+          to="/studio"
           className="mt-8 inline-flex items-center gap-2 rounded-lg bg-terracotta px-7 py-3.5 font-medium text-cream shadow-sm transition-colors hover:bg-terracotta-600"
         >
           Plan My Living Room
           <span aria-hidden="true">→</span>
-        </button>
+        </Link>
       </div>
     </section>
   );
