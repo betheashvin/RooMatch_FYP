@@ -27,6 +27,7 @@ class Category(str, Enum):
     rug = "rug"
     lighting = "lighting"
     ottoman = "ottoman"
+    curtain = "curtain"
 
 
 def seed_seller_id(name: str, contact_phone: str | None = None,

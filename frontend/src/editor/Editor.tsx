@@ -1,9 +1,9 @@
-import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api, ApiError } from "../lib/api";
 import { useAuth } from "../auth/authState";
-import type { Layout, Product } from "../types/api";
+import type { Product } from "../types/api";
 import { FurniturePalette } from "./FurniturePalette";
 import { RoomCanvas } from "./RoomCanvas";
 import type { BackgroundState } from "./RoomCanvas";
@@ -234,17 +234,6 @@ export function Editor() {
     reader.readAsDataURL(file);
   }
 
-  // Load a photo of a real wall and switch the walls to it. Stored as a data URL
-  // in component state (cosmetic only — never sent to the backend or validated).
-  function handleWallPhoto(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      setWallPhotoUrl(reader.result as string);
-      setWallFinishId("photo");
-    };
-    reader.readAsDataURL(file);
-  }
-
   async function handleValidate() {
     setValidating(true);
     setApiError(null);
@@ -259,11 +248,6 @@ export function Editor() {
     } finally {
       setValidating(false);
     }
-  }
-
-  function handleLoadLayout(layout: Layout) {
-    dispatch({ type: "loadLayout", layout, catalog });
-    setMode("manual");
   }
 
   if (loadingLayout || loadError) return <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-6 text-center text-ink">

@@ -1,9 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 
-import { useAuth } from "../auth/authState";
-import { readStudioDraft } from "../editor/studioDraft";
 import type { Product } from "../types/api";
 import { CatalogImage } from "./CatalogImage";
 

@@ -46,6 +46,21 @@ In PowerShell, activate with `.\.venv\Scripts\Activate.ps1` instead. If script
 execution is blocked, use `Set-ExecutionPolicy -Scope Process RemoteSigned` in
 that terminal first. The API runs on port 8000, with interactive docs at `/docs`.
 
+## Add curtains to the existing Neon catalog
+
+From `backend/`, using the database connection in `backend/.env`:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.add_curtains
+```
+
+Alternatively, run `backend/sql/002_add_curtains.sql` in the Neon SQL Editor.
+The migration enables the `curtain` category and adds `curtain-001` and
+`curtain-002` with their product images, dimensions, prices, styles, and colors.
+Both use the existing seller Karachi Home Co. Re-running the migration updates
+the two products without adding duplicates or moving existing catalog entries.
+Restart the backend after updating the category model if it is not using reload.
+
 ## Frontend setup (one-time)
 ```bash
 npm create vite@latest frontend -- --template react-ts   # run from project root

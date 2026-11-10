@@ -25,6 +25,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
   rug: "Rugs",
   lighting: "Lighting",
   ottoman: "Ottomans",
+  curtain: "Curtains",
 };
 
 const CATEGORY_ORDER = Object.keys(CATEGORY_LABEL) as Category[];

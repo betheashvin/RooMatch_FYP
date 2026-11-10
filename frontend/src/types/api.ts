@@ -12,7 +12,8 @@ export type Category =
   | "bookshelf"
   | "rug"
   | "lighting"
-  | "ottoman";
+  | "ottoman"
+  | "curtain";
 
 export type JsonValue =
   | string
