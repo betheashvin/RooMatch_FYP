@@ -123,40 +123,6 @@ export interface FitReport {
 export interface ValidateRequest {
   room: Room;
   placements: Placement[];
-  min_clearance_cm?: number;
-  door_clearance_cm?: number;
-}
-
-// --- recommendation engine (mirror backend/app/models/recommend.py) ---
-
-export interface RecommendedItem {
-  product: Product;
-  score: number;
-  reason: string;
-}
-
-export interface RecommendedSet {
-  items: RecommendedItem[];
-  total_price_pkr: number;
-  budget_pkr: number;
-  within_budget: boolean;
-}
-
-// Body for POST /api/recommend and /api/recommend/layout.
-export interface CategoryPreference {
-  attributes?: Record<string, string>;
-  min_size_cm?: number | null;
-  max_size_cm?: number | null;
-}
-
-export interface RecommendRequest {
-  room: Room;
-  budget_pkr: number;
-  style_tags?: string[];
-  style_seed_product_id?: string | null;
-  categories?: Category[];
-  preferences?: Partial<Record<Category, CategoryPreference>>;
-  colors?: string[];
 }
 
 // The authoritative placed + validated result (mirror backend/app/models/layout.py).

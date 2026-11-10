@@ -1,9 +1,6 @@
 import type {
   FitReport,
-  Layout,
   Product,
-  RecommendRequest,
-  RecommendedSet,
   ValidateRequest,
   LayoutSummary,
   LayoutWrite,

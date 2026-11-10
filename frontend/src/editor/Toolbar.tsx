@@ -131,12 +131,8 @@ const WALLS: { value: Wall; label: string }[] = [
 // Friendly labels for the engine's five spatial rules.
 const RULE_LABEL: Record<string, string> = {
   in_bounds: "Inside room",
-  no_overlap: "No overlaps",
-  clearance: "Clearance",
-  door_clearance: "Door swing",
-  orientation: "Against wall",
 };
-const RULE_ORDER = ["in_bounds", "no_overlap", "clearance", "door_clearance", "orientation"];
+const RULE_ORDER = ["in_bounds"];
 
 export function Toolbar({
   state,
@@ -156,7 +152,9 @@ export function Toolbar({
   onHelp,
   note,
 }: ToolbarProps) {
-  const selected = state.placements.find((p) => p.instanceId === state.selectedId);
+  const selected = state.placements.find(
+    (p) => p.instanceId === state.selectedId,
+  );
   const total = totalPkr(state.placements);
 
   // Local state for the "add door" form.
@@ -169,7 +167,12 @@ export function Toolbar({
   const addDoor = () => {
     const offset_cm = Number(doorOffset);
     const width_cm = Number(doorWidth);
-    if (!Number.isFinite(offset_cm) || !Number.isFinite(width_cm) || width_cm <= 0) return;
+    if (
+      !Number.isFinite(offset_cm) ||
+      !Number.isFinite(width_cm) ||
+      width_cm <= 0
+    )
+      return;
     dispatch({
       type: "addDoor",
       door: {
@@ -186,20 +189,36 @@ export function Toolbar({
   const byRule = new Map<string, RuleResult>();
   state.fitReport?.rules.forEach((r) => byRule.set(r.rule, r));
   const overBudget = state.budgetPkr != null && total > state.budgetPkr;
-  const failing = state.fitReport ? state.fitReport.rules.filter((r) => !r.passed).length : 0;
+  const failing = state.fitReport
+    ? state.fitReport.rules.filter((r) => !r.passed).length
+    : 0;
 
   return (
     <div className="flex flex-col gap-3">
       {/* Session actions — moved off the top bar to sit with the inspector. */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <button type="button" disabled={saving || accountLoading} onClick={onSave} className={BTN_GHOST + " flex-1 disabled:opacity-50"}>
+          <button
+            type="button"
+            disabled={saving || accountLoading}
+            onClick={onSave}
+            className={BTN_GHOST + " flex-1 disabled:opacity-50"}
+          >
             {saving ? "Saving…" : "Save"}
           </button>
-          <button type="button" disabled={saving} onClick={onNewLayout} className={BTN_GHOST + " flex-1 disabled:opacity-50"}>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={onNewLayout}
+            className={BTN_GHOST + " flex-1 disabled:opacity-50"}
+          >
             New layout
           </button>
-          <button type="button" onClick={onHelp} className={BTN_GHOST + " flex-1"}>
+          <button
+            type="button"
+            onClick={onHelp}
+            className={BTN_GHOST + " flex-1"}
+          >
             Help
           </button>
         </div>
@@ -237,7 +256,8 @@ export function Toolbar({
             </div>
 
             <div className="text-xs text-ink/60">
-              Dimensions: {selected.footprint.width_cm}W × {selected.footprint.depth_cm}D cm
+              Dimensions: {selected.footprint.width_cm}W ×{" "}
+              {selected.footprint.depth_cm}D cm
             </div>
 
             <div className="flex gap-2">
@@ -285,7 +305,10 @@ export function Toolbar({
               <button
                 type="button"
                 onClick={() =>
-                  dispatch({ type: "rotatePlacement", instanceId: selected.instanceId })
+                  dispatch({
+                    type: "rotatePlacement",
+                    instanceId: selected.instanceId,
+                  })
                 }
                 className={BTN_GHOST + " flex-1"}
               >
@@ -294,7 +317,10 @@ export function Toolbar({
               <button
                 type="button"
                 onClick={() =>
-                  dispatch({ type: "deletePlacement", instanceId: selected.instanceId })
+                  dispatch({
+                    type: "deletePlacement",
+                    instanceId: selected.instanceId,
+                  })
                 }
                 className={BTN_DANGER + " flex-1"}
               >
@@ -361,7 +387,9 @@ export function Toolbar({
                       <span className="text-ink/80">{RULE_LABEL[rule]}</span>
                     </span>
                     {r && !r.passed && r.detail && (
-                      <span className="pl-4 text-[11px] text-ink/50">{r.detail}</span>
+                      <span className="pl-4 text-[11px] text-ink/50">
+                        {r.detail}
+                      </span>
                     )}
                   </li>
                 );
@@ -380,13 +408,20 @@ export function Toolbar({
                 </span>
                 <span className="text-ink/80">
                   Budget — Rs {total.toLocaleString("en-PK")}
-                  {state.budgetPkr != null && ` / ${state.budgetPkr.toLocaleString("en-PK")}`}
+                  {state.budgetPkr != null &&
+                    ` / ${state.budgetPkr.toLocaleString("en-PK")}`}
                 </span>
               </li>
             </ul>
 
             {state.budgetPkr != null && (
-              <div className={overBudget ? "text-xs text-terracotta-600" : "text-xs text-forest-700"}>
+              <div
+                className={
+                  overBudget
+                    ? "text-xs text-terracotta-600"
+                    : "text-xs text-forest-700"
+                }
+              >
                 {overBudget
                   ? `Over budget by Rs ${(total - state.budgetPkr).toLocaleString("en-PK")}`
                   : `Within budget (Rs ${(state.budgetPkr - total).toLocaleString("en-PK")} to spare)`}
@@ -405,7 +440,8 @@ export function Toolbar({
             onChange={(e) =>
               dispatch({
                 type: "setBudget",
-                budgetPkr: e.target.value === "" ? null : Number(e.target.value),
+                budgetPkr:
+                  e.target.value === "" ? null : Number(e.target.value),
               })
             }
             className={FIELD + " w-full min-w-0"}
@@ -421,7 +457,11 @@ export function Toolbar({
               value={state.room.width_cm}
               min={100}
               onCommit={(v) =>
-                dispatch({ type: "setRoomSize", width_cm: v, length_cm: state.room.length_cm })
+                dispatch({
+                  type: "setRoomSize",
+                  width_cm: v,
+                  length_cm: state.room.length_cm,
+                })
               }
             />
             <NumInput
@@ -429,13 +469,19 @@ export function Toolbar({
               value={state.room.length_cm}
               min={100}
               onCommit={(v) =>
-                dispatch({ type: "setRoomSize", width_cm: state.room.width_cm, length_cm: v })
+                dispatch({
+                  type: "setRoomSize",
+                  width_cm: state.room.width_cm,
+                  length_cm: v,
+                })
               }
             />
           </div>
 
           <div className="flex flex-col gap-2 rounded-lg border border-sand bg-white/60 p-2">
-            <span className="text-xs font-medium text-ink/70">Trace a floor plan (optional)</span>
+            <span className="text-xs font-medium text-ink/70">
+              Trace a floor plan (optional)
+            </span>
             <input
               type="file"
               accept="image/*"
@@ -470,12 +516,16 @@ export function Toolbar({
                     onChange={(e) => onBgOpacity(Number(e.target.value))}
                   />
                 </label>
-                <button type="button" onClick={onClearImage} className={BTN_GHOST + " self-start"}>
+                <button
+                  type="button"
+                  onClick={onClearImage}
+                  className={BTN_GHOST + " self-start"}
+                >
                   Remove image
                 </button>
                 <p className="text-[11px] text-ink/40">
-                  Drag the image on the canvas to position it. Room dimensions above stay the
-                  source of truth for validation.
+                  Drag the image on the canvas to position it. Room dimensions
+                  above stay the source of truth for validation.
                 </p>
               </div>
             )}
@@ -533,7 +583,11 @@ export function Toolbar({
               />
               Swings inward
             </label>
-            <button type="button" onClick={addDoor} className={BTN_PRIMARY + " self-start"}>
+            <button
+              type="button"
+              onClick={addDoor}
+              className={BTN_PRIMARY + " self-start"}
+            >
               Add door
             </button>
 
