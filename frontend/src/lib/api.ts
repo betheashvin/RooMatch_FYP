@@ -71,10 +71,6 @@ export const api = {
   product: (id: string) => getJson<Product>(`/catalog/${id}`),
   validate: (req: ValidateRequest) =>
     postJson<ValidateRequest, FitReport>("/validate", req),
-  recommend: (req: RecommendRequest) =>
-    postJson<RecommendRequest, RecommendedSet>("/recommend", req),
-  recommendLayout: (req: RecommendRequest) =>
-    postJson<RecommendRequest, Layout>("/recommend/layout", req),
   register: (email: string, password: string) => request<{ detail: string }>("/auth/register", "POST", { email, password }),
   login: (email: string, password: string) => request<User>("/auth/login", "POST", { email, password }),
   verifyEmail: (email: string, otp: string) => request<User>("/auth/verify-email", "POST", { email, otp }),
