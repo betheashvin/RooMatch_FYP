@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api, ApiError } from "../lib/api";
@@ -17,6 +17,10 @@ import { fromSavedLayout, toSavedLayout } from "./savedLayouts";
 import { clearStudioDraft, DEFAULT_APPEARANCE, readStudioDraft, writeStudioDraft } from "./studioDraft.ts";
 import type { DraftIntent, StudioDraft } from "./studioDraft.ts";
 
+
+const RoomScene3D = lazy(() =>
+   import ("./RoomScene3D.tsx").then((m) =>({ default: m.RoomScene3D })),
+);
 
 const EMPTY_LAYOUT = JSON.stringify(toSavedLayout(initialEditorState, initialEditorState.room.name, DEFAULT_APPEARANCE));
 
@@ -319,7 +323,28 @@ export function Editor() {
                     }
                     onBgMove={(x, y) => setBg((b) => (b ? { ...b, x, y } : b))}
                   />
-                ) :<></>}
+                ) :(
+                  <Suspense
+                  fallback={<div className="flex h-[70vh] items-center justify-center text-sm text-ink/50">
+                    Loading 3D view…
+                  </div>}
+                  >
+                    <RoomScene3D
+                      room={state.room}
+                      placements={state.placements}
+                      selectedId = {state.selectedId}
+                      onSelect={(id) => dispatch({ type: "select", instanceId: id })}
+                      onMove={(id, x, y) =>
+                        dispatch({ type: "movePlacement", instanceId: id, x, y })
+                      }
+                      wallColor={wallColor}
+                      wallFinishId={wallFinishId}
+                      wallPhotoUrl={wallPhotoUrl}
+                      floorId = {floorId}
+                      backdropUrl={backdropUrl}
+                    />
+                  </Suspense>
+                )}
               </div>
             </>
           )}
