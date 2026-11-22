@@ -40,12 +40,12 @@ async def database_unavailable(_request: Request, exc: SQLAlchemyError):
     logging.getLogger(__name__).warning("Database operation failed: %s", type(exc).__name__)
     return JSONResponse(status_code=503, content={"detail": "Database temporarily unavailable. Please try again later."})
 
-# The React dev server (Vite) serves on port 5173. Allow it to call the API
+# The React dev server (Vite) serves on port 5174. Allow it to call the API
 # during development. Tighten / make configurable before any deployment.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in os.getenv(
-        "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+        "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
     ).split(",")],
     allow_credentials=True,
     allow_methods=["*"],

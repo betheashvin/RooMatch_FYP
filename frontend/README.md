@@ -26,10 +26,14 @@ Saving before starting a new layout preserves the current layout in My layouts.
 Normal room edits remain in memory until saved; reloading or closing a room with
 unsaved changes triggers a browser reminder. Uploaded photos are temporary.
 
-For local development alongside roomatch_ref, run this frontend on port 5174 and
-its backend on port 8001. Set VITE_API_BASE to http://127.0.0.1:8001/api in
-frontend/.env.local and allow the frontend's origin through FRONTEND_ORIGINS in
-backend/.env. The development API client aligns localhost and 127.0.0.1 with the
+For local development, run this frontend on port 5174 and its backend on port
+8000. The frontend uses http://<frontend hostname>:8000/api by default, and
+backend/.env allows both localhost and 127.0.0.1 on port 5174.
+
+To run alongside roomatch_ref, use backend port 8001 and set VITE_API_BASE to
+http://127.0.0.1:8001/api in frontend/.env.local. Restart the backend after
+changing backend/.env and restart Vite after changing frontend/.env.local.
+The development API client aligns localhost and 127.0.0.1 with the
 frontend's hostname so SameSite cookies accompany requests across ports.
 FYP uses the roomatch_fyp_session cookie, keeping its login separate from Ref.
 

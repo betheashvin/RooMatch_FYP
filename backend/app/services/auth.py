@@ -62,7 +62,7 @@ def check_origin(request: Request) -> None:
     """Reject cross-site state changes even when cookies are sent by a client."""
     origin = request.headers.get("origin")
     allowed = {x.strip() for x in os.getenv(
-        "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+        "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
     ).split(",")}
     if origin and origin not in allowed:
         raise HTTPException(403, "Request origin is not allowed.")

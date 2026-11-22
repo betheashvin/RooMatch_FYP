@@ -71,6 +71,6 @@ npm --prefix frontend install tailwindcss @tailwindcss/vite konva react-konva
 ## Frontend — run & build
 ```bash
 cd frontend
-npm run dev       # app at http://localhost:5173 (start backend first)
+npm run dev       # app at http://localhost:5174 (start backend first)
 npm run build     # production build / type-check
 ```

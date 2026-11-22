@@ -10,7 +10,7 @@ import type {
 
 // Loopback API requests must use the frontend's hostname in development so
 // SameSite=Lax cookies work even when VITE_API_BASE uses the other local alias.
-const apiUrl = new URL(import.meta.env.VITE_API_BASE || `http://${window.location.hostname}:8001/api`, window.location.origin);
+const apiUrl = new URL(import.meta.env.VITE_API_BASE || `http://${window.location.hostname}:8000/api`, window.location.origin);
 const loopbackHosts = ["localhost", "127.0.0.1", "[::1]"];
 if (import.meta.env.DEV && loopbackHosts.includes(window.location.hostname) && loopbackHosts.includes(apiUrl.hostname)) {
   apiUrl.hostname = window.location.hostname;

@@ -1,6 +1,5 @@
 import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
-
 import type { Product } from "../types/api";
 import { CatalogImage } from "./CatalogImage";
 

@@ -131,8 +131,10 @@ const WALLS: { value: Wall; label: string }[] = [
 // Friendly labels for the engine's five spatial rules.
 const RULE_LABEL: Record<string, string> = {
   in_bounds: "Inside room",
+  no_overlap: "No overlaps",
+  clearance: "Clearance"
 };
-const RULE_ORDER = ["in_bounds"];
+const RULE_ORDER = ["in_bounds", "no_overlap", "clearance"];
 
 export function Toolbar({
   state,
