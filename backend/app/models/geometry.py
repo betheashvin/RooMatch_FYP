@@ -6,7 +6,7 @@ CONVENTIONS (relied on by the room model, catalog, and the spatial engine):
 - Coordinate system: 2D top-down. Origin (0, 0) is the TOP-LEFT corner of the
   room. +x points right, +y points DOWN (the screen / Konva convention). A room
   of width W and length L therefore spans (0, 0) -> (W, L).
-- Rotation: degrees, clockwise, measured about an item's CENTER. The MVP only
+- Rotation: degrees, clockwise, measured about an item's CENTER.
   uses 0 / 90 / 180 / 270, but the field is a float so we are not boxed in.
 
 Keeping these in one place means the floor-plan editor, the recommendation

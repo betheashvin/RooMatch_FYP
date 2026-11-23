@@ -46,6 +46,7 @@ export interface Product {
   attributes?: Record<string, string>;
   color?: string | null;
   image?: string | null;
+  images?: string[]; // Optional additional photos; image remains the cover.
   glb_url?: string | null;
   listing_url?: string | null; // Product page; seller.website_url is the supplier site.
   seller: Seller;

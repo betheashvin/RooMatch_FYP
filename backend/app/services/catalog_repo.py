@@ -4,9 +4,11 @@ The editor and both engines receive the same Product/Seller models, including
 supplier details and the product-specific listing URL.
 """
 
+from collections import defaultdict
+from ..database import get_engine
 from sqlmodel import Session, select
 
-from ..database import get_engine
+from sqlalchemy.engine import Engine
 from ..models.catalog import CatalogProduct, CatalogProductImage, CatalogSeller
 from ..models.product import Product, Seller
 
@@ -26,14 +28,14 @@ def _product_images(session: Session, product_ids: list[str]) -> dict[str, list[
     if not product_ids:
         return{}
     rows = session.exec(select(CatalogProductImage).where(CatalogProductImage.product_id.in_(product_ids),)
-                        .order_by(CatalogProductImage.product_idin_(product_ids),CatalogProductImage.sort_order)).all()
+                        .order_by(CatalogProductImage.product_id, CatalogProductImage.sort_order)).all()
     images: dict[str, list[str]] = defaultdict(list)
     for row in rows:
         images[row.product_id].append(row.image_url)
-        return dict(images)
+    return dict(images)
 
     
-def load_catalog() -> list[Product]:
+def load_catalog(engine: Engine | None = None) -> list[Product]:
     """Read a fresh ordered catalog, including supplier and asset URL metadata."""
     with Session(engine if engine is not None else get_engine()) as session:
         rows = session.exec(_catalog_query().order_by(CatalogProduct.sort_order, CatalogProduct.id)).all()
@@ -43,7 +45,7 @@ def load_catalog() -> list[Product]:
 
 def get_product(product_id: str) -> Product | None:
     """Query one product by its stable ID without reading the whole catalog."""
-    with Session(engine if engine is not None else get_engine()) as session:
+    with Session(get_engine()) as session:
         row = session.exec(_catalog_query().where(CatalogProduct.id == product_id)).one_or_none()
         if row is None:
             return None

@@ -1,0 +1,5 @@
+/* Keep the display size tied to the popup while Three.js resizes its buffer. */
+.product-model-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

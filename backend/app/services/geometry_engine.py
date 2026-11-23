@@ -7,20 +7,30 @@ clockwise about an item's center.
 
 Rules implemented:
   - in_bounds       every item sits fully inside the room (touching a wall is fine)
-   - no_overlap      no item collides with another item or a fixed obstacle
+  - no_overlap      no item collides with another item or a fixed obstacle
+  - clearance       items are either touching or at least `min_clearance_cm` apart
+  - door_clearance  nothing intrudes into a door's swing arc or entry passage
+  - orientation     wall-anchored items (e.g. sofas) actually sit against a wall
 """
 from itertools import combinations
 from shapely.affinity import rotate
-from shapely.geometry import Polygon, box
+from shapely.geometry import Point, Polygon, box
+from shapely.ops import unary_union
 
 from ..models.geometry import Footprint
 from ..models.layout import FitReport, Placement, RuleResult
-from ..models.room import Room
+from ..models.room import Door, Room, Wall
+
 
 # Overlap areas below this (cm^2) are floating-point dust, not a real collision.
 # Two rectangles that merely share an edge intersect in a line (area 0), so this
 # threshold only ever absorbs rounding noise introduced by rotation.
 _AREA_EPS = 1e-6
+
+def _sign(value: float) -> float:
+    """-1, 0, or +1 — used to read an axis-aligned direction off a delta."""
+    return (value > 0) - (value < 0)
+
 
 # --- the footprint -> polygon primitive -------------------------------------
 
@@ -91,8 +101,29 @@ def door_swing_polygon(room: Room, door: Door) -> Polygon | None:
      )
      return Point(hinge). buffer(r).intersection(quadrant)
 
+def door_passage_polygon(room: Room, door: Door, depth_cm: float) -> Polygon:
+    """A clear-entry rectangle across the doorway, extending `depth_cm` inward.
 
-    
+    This is what lets a person actually step into the room, so it applies no
+    matter which way (or whether) the door swings.
+    """
+    near, far, inward = _door_opening(room, door)
+    return Polygon([
+        near,
+        far,
+        (far[0] + depth_cm * inward[0], far[1] + depth_cm * inward[1]),
+        (near[0] + depth_cm * inward[0], near[1] + depth_cm * inward[1]),
+    ])
+
+
+def door_keep_clear_polygon(room: Room, door: Door, depth_cm: float) -> Polygon:
+    """The whole region a door needs kept clear: swing arc + entry passage,
+    clipped to the room so it is safe to draw and to test against."""
+    parts = [door_passage_polygon(room, door, depth_cm)]
+    swing = door_swing_polygon(room, door)
+    if swing is not None:
+        parts.append(swing)
+    return unary_union(parts).intersection(room_polygon(room))
   
 
 
@@ -115,7 +146,7 @@ def _check_in_bounds(
     return RuleResult(rule="in_bounds", passed=passed, detail=detail)
 
 def _check_no_overlap(
-        room: Room, Placements: list[Placement], polys: list[Polygon]
+        room: Room, placements: list[Placement], polys: list[Polygon]
 ) -> RuleResult:
     """Noitem may overlap another item or a fixed obstacle already in the room"""
     clashes: list[str] = []
@@ -125,16 +156,16 @@ def _check_no_overlap(
         if polys[i].intersection(polys[j]).area > _AREA_EPS:
            clashes.append(f"{placements[i].product_id} x {placement[j].product_id}")
 
-           # Item vs fixed furniture the user is keeping.
-           fixed = [(fi.id, footprint_to_polygon(fi.footprint)) for fi in room .fixed_items]
-           for placement, poly in zip(placements, polys):
-               for fixed_id, fixed_poly in fixed:
-                   if poly.intersection(fixed_poly).area > _AREA_EPS:
-                       clashes.append(f"{placement.product_id} x fixed:{fixed_id}")
-
-                       passed = not clashes
-                       detail = None if passed else "overlaps: " + ",".join(clashes)
-                       return RuleResult(rule="no_overlap", passed=passed, detail=detail)
+    # Item vs fixed furniture the user is keeping.
+    fixed = [(fi.id, footprint_to_polygon(fi.footprint)) for fi in room .fixed_items]
+    for placement, poly in zip(placements, polys):
+        for fixed_id, fixed_poly in fixed:
+            if poly.intersection(fixed_poly).area > _AREA_EPS:
+                clashes.append(f"{placement.product_id} x fixed:{fixed_id}")
+    
+    passed = not clashes
+    detail = None if passed else "overlaps: " + ",".join(clashes)
+    return RuleResult(rule="no_overlap", passed=passed, detail=detail)
 
 def _check_clearance(
             room:Room,
@@ -142,35 +173,89 @@ def _check_clearance(
             polys: list[Polygon],
             min_clearance_cm: float,
     ) -> RuleResult:
-          """Items must be either touching (gap 0, deliberate) or at least
+        """Items must be either touching (gap 0, deliberate) or at least
     `min_clearance_cm` apart. A nonzero gap smaller than that is unusable dead
     space. Overlaps report as gap 0 here, so they stay silent — `no_overlap`
     already owns them and we avoid double-reporting."""
-          clashes: list[str]= []
-          for i, j in combinations(range(len(polys)), 2):
-              gap = polys[i].distance(polys[j])
-              if 0 < gap < min_clearance_cm:
-                  clashes.append(
+        clashes: list[str]= []
+        for i, j in combinations(range(len(polys)), 2):
+            gap = polys[i].distance(polys[j])
+            if 0 < gap < min_clearance_cm:
+                clashes.append(
                       f"{placements[i].product_id} <-> {placements[j].product_id} ({gap:0f}cm)"
                   )
-                  passed = not clashes
-                  detail = None if passed else "tight gaps: " + ", ".join(clashes)
-                  return RuleResult(rule="clearance", passed=passed, detail=detail)
+        passed = not clashes
+        detail = None if passed else "tight gaps: " + ", ".join(clashes)
+        return RuleResult(rule="clearance", passed=passed, detail=detail)
+
+
+def _check_door_clearance(
+    room: Room,
+    placements: list[Placement],
+    polys: list[Polygon],
+    door_clearance_cm: float,
+) -> RuleResult:
+    """No placed item may intrude into any door's swing arc or entry passage."""
+    clashes: list[str] = []
+    for door in room.doors:
+        region = door_keep_clear_polygon(room, door, door_clearance_cm)
+        for placement, poly in zip(placements, polys):
+            if poly.intersection(region).area > _AREA_EPS:
+                clashes.append(f"{placement.product_id} blocks door:{door.id}")
+    passed = not clashes
+    detail = None if passed else "; ".join(clashes)
+    return RuleResult(rule="door_clearance", passed=passed, detail=detail)
+
+
+def _check_orientation(
+    room: Room,
+    placements: list[Placement],
+    polys: list[Polygon],
+    wall_anchored_ids: frozenset[str],
+    wall_tol_cm: float,
+) -> RuleResult:
+    """Items that belong against a wall (sofas, TV consoles, bookshelves) must
+    actually sit against one. We can't read "which face is the back" from a bare
+    footprint, so the MVP rule is the honest, checkable version: such an item's
+    polygon must come within `wall_tol_cm` of the room boundary (0 when flush).
+    Which ids are wall-anchored is decided by the caller from product category,
+    so this module stays pure geometry."""
+    if not wall_anchored_ids:
+        return RuleResult(rule="orientation", passed=True)
+    boundary = room_polygon(room).exterior
+    offenders: list[str] = []
+    for placement, poly in zip(placements, polys):
+        anchored = placement.product_id in wall_anchored_ids
+        if anchored and poly.distance(boundary) > wall_tol_cm:
+            offenders.append(placement.product_id)
+    passed = not offenders
+    detail = None if passed else "not against a wall: " + ", ".join(offenders)
+    return RuleResult(rule="orientation", passed=passed, detail=detail)
+
 
 def validate_layout(
     room: Room,
     placements: list[Placement],
+    *,
+    min_clearance_cm: float = 30.0,
+    door_clearance_cm: float = 60.0,
+    wall_anchored_ids: frozenset[str] = frozenset(),
+    wall_tol_cm: float = 15.0,
 ) -> FitReport:
     """Run every spatial rule over a layout and return a per-rule FitReport.
 
     `valid` is the logical AND of every rule, so a layout is only accepted when
     it passes all of them. Callers get the full per-rule breakdown either way,
-    which is what the UI and the evaluation harness need. 
+    which is what the UI and the evaluation harness need. The clearance
+    thresholds and the wall-anchored set are tunable so evaluation can study
+    their effect and so callers own product policy.
     """
     polys = [footprint_to_polygon(p.footprint) for p in placements]
     rules = [
         _check_in_bounds(room, placements, polys),
         _check_no_overlap(room, placements, polys),
-        _check_clearance(room, placements, polys, min_clearance_cm=10.0),  # Example clearance value
+        _check_clearance(room, placements, polys, min_clearance_cm),
+        _check_door_clearance(room, placements, polys, door_clearance_cm),
+        _check_orientation(room, placements, polys, wall_anchored_ids, wall_tol_cm),
     ]
     return FitReport(valid=all(r.passed for r in rules), rules=rules)

@@ -132,9 +132,17 @@ const WALLS: { value: Wall; label: string }[] = [
 const RULE_LABEL: Record<string, string> = {
   in_bounds: "Inside room",
   no_overlap: "No overlaps",
-  clearance: "Clearance"
+  clearance: "Clearance",
+  door_clearance: "Door Clearance",
+  orientation: "Orientation",
 };
-const RULE_ORDER = ["in_bounds", "no_overlap", "clearance"];
+const RULE_ORDER = [
+  "in_bounds",
+  "no_overlap",
+  "clearance",
+  "door_clearance",
+  "orientation",
+];
 
 export function Toolbar({
   state,

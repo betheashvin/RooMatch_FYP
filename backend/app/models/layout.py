@@ -1,8 +1,6 @@
 """The authoritative output types: where products go and whether the layout is valid.
 
-These are defined now so the whole system shares one result shape, but they are a
-light stub for steps 1-2. The spatial-validation engine (step 3) is what actually
-produces `Placement`s and fills in the `FitReport`.
+These are defined now so the whole system shares one result shape
 """
 
 from pydantic import BaseModel
@@ -18,7 +16,7 @@ class Placement(BaseModel):
 
 
 class RuleResult(BaseModel):
-    """The pass/fail outcome of a single spatial rule, e.g. `no_overlap`."""
+    """The pass/fail outcome of a single spatial rule, e.g. `inbound`."""
 
     rule: str
     passed: bool

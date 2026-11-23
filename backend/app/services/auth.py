@@ -12,8 +12,7 @@ from sqlmodel import Session
 from ..database import get_session
 from ..models.accounts import AuthSession, User, utcnow
 
-# Cookies are shared across ports on the same hostname. Keep this app's login
-# separate from roomatch_ref when both development servers are running.
+# Cookies are shared across ports on the same hostname. 
 COOKIE_NAME = "roomatch_fyp_session"
 SESSION_SECONDS = 7 * 24 * 60 * 60
 

@@ -6,6 +6,7 @@ import { AuthPage } from "./auth/AuthPage";
 import { PasswordRecovery } from "./auth/PasswordRecovery";
 import { RequireAuth } from "./auth/AuthContext";
 import { Dashboard } from "./dashboard/Dashboard";
+import { CatalogPage } from "./catalog/CatalogPage";
 
 export default function App() {
   const { pathname, hash } = useLocation();
@@ -19,14 +20,46 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/catalog" element={<CatalogPage />} />
+
       <Route path="/login" element={<AuthPage key="login" mode="login" />} />
       <Route path="/signup" element={<AuthPage key="signup" mode="signup" />} />
-      <Route path="/verify-email" element={<AuthPage key="verify" mode="verify" />} />
-      <Route path="/forgot-password" element={<PasswordRecovery key="forgot" mode="request" />} />
-      <Route path="/reset-password" element={<PasswordRecovery key="reset" mode="reset" />} />
-      <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-      <Route path="/studio" element={<RequireAuth allowGuest><Editor /></RequireAuth>} />
-      <Route path="/studio/:layoutId" element={<RequireAuth><Editor /></RequireAuth>} />
+      <Route
+        path="/verify-email"
+        element={<AuthPage key="verify" mode="verify" />}
+      />
+      <Route
+        path="/forgot-password"
+        element={<PasswordRecovery key="forgot" mode="request" />}
+      />
+      <Route
+        path="/reset-password"
+        element={<PasswordRecovery key="reset" mode="reset" />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <RequireAuth>
+            <Dashboard />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/studio"
+        element={
+          <RequireAuth allowGuest>
+            <Editor />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/studio/:layoutId"
+        element={
+          <RequireAuth>
+            <Editor />
+          </RequireAuth>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

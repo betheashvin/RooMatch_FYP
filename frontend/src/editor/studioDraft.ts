@@ -38,7 +38,7 @@ export function writeStudioDraft(draft: StudioDraft) {
   catch { /* The in-memory draft still survives the sign-in flow. */ }
 }
 
-export function readStudioDraft(layoutId: string | null, ownerId: string | null): StudioDraft | null {
+export function readStudioDraft(layoutId: string | null | undefined, ownerId: string | null): StudioDraft | null {
   try {
     const draft: StudioDraft | null = memoryDraft ?? JSON.parse(window.sessionStorage.getItem(KEY) || "null");
     if (!draft || draft.version !== 1 || draft.layoutId !== layoutId ||

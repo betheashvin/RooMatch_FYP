@@ -49,10 +49,23 @@ class CatalogProduct(SQLModel, table=True):
     style_tags: list[str] = Field(default_factory=list, sa_column=json_column())
     attributes: dict[str, str] = Field(default_factory=dict, sa_column=json_column())
     color: str | None = Field(default=None, max_length=128)
-    # Local public paths or hosted URLs; image/GLB files are served separately.
     image: str | None = Field(default=None, max_length=2048)
     glb_url: str | None = Field(default=None, max_length=2048)
     style_embedding: list[float] | None = Field(default=None, sa_column=json_column(nullable=True))
     seller_id: UUID = Field(foreign_key="sellers.seller_id", index=True)
     listing_url: str | None = Field(default=None, max_length=2048)
     sort_order: int = Field(default=0, ge=0, index=True)
+
+class CatalogProductImage(SQLModel, table=True):
+    """Ordered extra photos; the existing products.image remains the cover."""
+
+    __tablename__ = "product_images"
+    __table_args__ = (
+        CheckConstraint("sort_order >= 0", name="ck_product_image_sort_order_nonnegative"),
+    )
+
+    product_id: str = Field(
+        primary_key=True, foreign_key="products.id", ondelete="CASCADE", max_length=128,
+    )
+    sort_order: int = Field(default=0, primary_key=True, ge=0)
+    image_url: str = Field(min_length=1, max_length=2048)

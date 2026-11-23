@@ -1,8 +1,7 @@
 """The furniture catalog schema.
 
 One `Product` is one real, locally-buyable item. Dimensions are the footprint
-the spatial-validation engine depends on, so they MUST be accurate (see the
-project doc, section 6.3). `style_embedding` is the precomputed CLIP vector used
+the spatial-validation engine depends on. `style_embedding` is the precomputed CLIP vector used
 by the recommendation engine's style-similarity feature; it is filled in later
 (step 4), so it is optional here.
 """
