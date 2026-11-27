@@ -22,9 +22,9 @@ import {
 } from "./studioDraft.ts";
 import type { DraftIntent, StudioDraft } from "./studioDraft.ts";
 
-// const RoomScene3D = lazy(() =>
-//   import("./RoomScene3D.tsx").then((m) => ({ default: m.RoomScene3D })),
-// );
+const RoomScene3D = lazy(() =>
+  import("./RoomScene3D.tsx").then((m) => ({ default: m.RoomScene3D })),
+);
 
 const EMPTY_LAYOUT = JSON.stringify(
   toSavedLayout(
@@ -481,7 +481,7 @@ export function Editor() {
                       </div>
                     }
                   >
-                    {/* <RoomScene3D
+                    <RoomScene3D
                       room={state.room}
                       placements={state.placements}
                       selectedId={state.selectedId}
@@ -496,7 +496,7 @@ export function Editor() {
                       wallPhotoUrl={wallPhotoUrl}
                       floorId={floorId}
                       backdropUrl={backdropUrl}
-                    /> */}
+                    /> 
                   </Suspense>
                 )}
               </div>
